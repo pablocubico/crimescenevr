@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>CrimeScene VR</title>
+		<link href='fonts/fonts.css' rel='stylesheet' type='text/css'>
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+			}
+
+			body {
+				background-color: #ffffff;
+				margin: 0;
+				overflow: hidden;
+				font-family: Montserrat;
+				font-weight: 400;
+			}
+
+			#blocker {
+
+				position: absolute;
+
+				width: 100%;
+				height: 100%;
+
+				background-color: rgba(0,0,0,0.5);
+
+			}
+
+			#instructions {
+
+				width: 100%;
+				height: 100%;
+
+				display: -webkit-box;
+				display: -moz-box;
+				display: box;
+
+				-webkit-box-orient: horizontal;
+				-moz-box-orient: horizontal;
+				box-orient: horizontal;
+
+				-webkit-box-pack: center;
+				-moz-box-pack: center;
+				box-pack: center;
+
+				-webkit-box-align: center;
+				-moz-box-align: center;
+				box-align: center;
+
+				color: #ffffff;
+				text-align: center;
+
+				cursor: pointer;
+
+			}
+
+			.svg-back {
+                position: fixed;
+                background: url(images/blueprint.jpg) no-repeat top center;
+                top: 0px;
+                left: 0px;
+                width: 500px;
+                height: 100%;
+			}
+
+            #svg-container {
+            	position: relative;
+            	top: 0;
+            	left: 0;
+                width: 500px;
+                height: 500px;
+                box-shadow: 0 0 10px rgba(0,0,0,.6);
+                border-bottom: 4px solid white;
+            }
+
+            #pointerLockToggle {
+            	background: rgba(0,0,0,.5);
+            	padding: 30px;
+            	font-size: 18pt;
+            	position: fixed;
+            	bottom: 20px;
+            	right: 20px;
+            	z-index: 49999;
+            	cursor: pointer;
+            	color: white;
+            	border: 3px solid white;
+            	border-radius: 10px;
+            }
+
+            #intro {
+            	background: url(images/crimescenevr-bg.jpg) no-repeat center center;
+            	background-size: cover;
+            	position: fixed;
+            	width: 100%;
+            	height: 100%;
+            	z-index: 99999;
+            	transition: all .5s;
+            	top: 0%;
+            }
+
+            #intro.hide {
+            	top: -100%;
+            	transition: all .5s;
+            	opacity: 0;
+            }
+
+            .intro-padder {
+            	width: 500px;
+            	padding: 40px;
+            	color: white;
+            	margin: 40px auto;
+            	background-color: rgba(0,0,0,.8);
+            	border-radius: 15px;
+            	box-shadow: 0 0 30px 10px black;
+            }
+
+			.intro-padder h1 {
+				margin-top: 0;
+			}
+
+			.intro-padder p {
+				color: #999;
+			}
+
+			.intro-padder a {
+				font-size: 40pt;
+				margin: 20px auto;
+				background: orange;
+				color: black;
+				padding: 30px 30px 20px 30px;
+				display: block;
+				width: auto;
+				border: none;
+				font-family: "Montserrat";
+				cursor: pointer;
+				text-decoration: none;
+				width: 200px;
+				text-align: center;
+			}
+
+			#web-gl-wrapper {
+				position: fixed;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+			}
+
+			/* Z-Indexes */
+			#web-gl-wrapper {
+				z-index: 49999;
+			}
+
+			.svg-back {
+				z-index: 59999;
+			}
+
+			.vr-button {
+				z-index: 69999;
+			}
+
+			/* Sizes doubled for better resolution */
+			.info-text {
+				background: rgba(255,255,255,.8); 
+				width: 600px; 
+				height: 800px; 
+				padding: 80px; z-index: -99999;
+				font-size: 2em;
+				font-family: "Montserrat";
+				font-weight: 400;
+			}
+
+			.info-text img {
+				width: 100%;
+				max-width: 100%;
+			}
+
+			.info-text h1 {
+				margin-top: 0;
+				font-weight: 600;
+				font-family: "Montserrat";
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="intro">
+			<div class="intro-padder">
+				<h1>CrimeSceneVR</h1>
+				<h3>VR crime scene storyteller.</h3>
+				<p>
+					Place objects on the blueprint to recreate a crime scene.<br>
+				</p>
+				<p>Upcoming fixes/features:</p>
+				<ul>
+					<li>Floating information texts</li>
+					<li>Use a floorplan reference background</li>
+					<li>Match room/dimensions and project correctly</li>
+					<li>Physics engine</li>
+					<li>Object scale slider</li>
+					<li>Object altitude (y axis) slider</li>
+					<li>Model Library</li>
+				</ul>
+				<a href="#">CROSS</a>
+			</div>
+		</div>
+
+		<div class="svg-back no-vr">
+        	<svg id="svg-container"></svg>
+        	<div class="actions">
+        		<button>Add Wall</button>
+        		<button>Add Light</button>
+        	</div>
+        </div>
+
+		<!-- ThreeJS -->
+		<!--<script src="bower_components/threejs/build/three.min.js"></script>-->
+		<script src="js/three.min.js"></script>
+		<script src="js/PointerLockControls.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/ColladaLoader.js"></script>
+		<script src="js/Mirror.js"></script>
+
+		<!-- VR Goodies -->
+		<script src="js/VRControls.js"></script>
+		<script src="js/VREffect.js"></script>
+		<script src="js/webvr-polyfill.js"></script>
+		<script src="js/webvr-manager.js"></script>
+
+		<!-- SnapSVG -->
+		<script src="bower_components/snap.svg/dist/snap.svg-min.js"></script>
+        <script src="js/snap.svg.free_transform.js"></script>
+
+        <!-- HTML Rasterizer -->
+		<script src="js/html2canvas.js"></script>        
+
+		<!--
+		<div id="blocker">
+
+			<div id="instructions">
+				<span style="font-size:40px">Click to play</span>
+				<br />
+				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+			</div>
+
+		</div>
+		-->
+
+		<div id="web-gl-wrapper"></div>
+		
+		<div id="pointerLockToggle" class="no-vr">
+			Mouse look around
+		</div>
+
+		<script>
+
+			var threeToCmFactor = 100 / 250;
+			var pxToThreeFactor = 500 / 100;
+			function pxToCm(pixels) {
+				return (pixels / pxToThreeFactor) / threeToCmFactor;
+			}
+			function pxToThree(pixels) {
+				return (pixels / pxToThreeFactor);	
+			}
+
+			function CrimeSceneVR() {
+
+				var self = this;
+
+				var camera, scene, renderer;
+				var geometry, material, mesh;
+
+				self.controls = null;
+				self.placedObjects = [];
+				self.raycaster = null;
+				
+				self.roomHeight = 30;
+				self.wallWidth = 2;
+
+				self.controlsEnabled = false;
+				self.moveForward = false;
+				self.moveBackward = false;
+				self.moveLeft = false;
+				self.moveRight = false;
+
+				self.prevTime = performance.now();
+				self.velocity = new THREE.Vector3();
+
+				self.addTexts = function() {
+					
+					var texts = [
+						{ title: "Beretta", heading: "Arma policial", image: "images/beretta92.jpg", paragraph: "Voceros de la <b>comisaría Segunda</b> señalaron que poco después se determinó que <b>el arma había sido sustraída</b> los primeros días de enero de la vivienda del oficial principal de la Delegación Departamental de Investigaciones Rubén Walter.", x: 10, y: 10 },
+					];
+
+					texts.map(function(placedObject) { 
+
+						Snap.load('./images/icons/text.svg', function (loadedIcon) {
+
+							placedObject.svg = self.paper.g();
+
+							var circledIcon = self.paper.g();
+							// 64x64 Icons
+							var circle = self.paper.circle(32, 32, 48);
+							circle.attr({ fill: "#9df", "fill-opacity": 0.5 });
+
+							circledIcon.append(circle);
+							circledIcon.append(loadedIcon);
+							placedObject.svg.append(circledIcon);
+
+						    self.paper.freeTransform(placedObject.svg, { scale: false, size: 15 });
+
+						    placedObject.svg.freeTransform.attrs.translate.x = placedObject.x;
+						    placedObject.svg.freeTransform.attrs.translate.y = placedObject.y;
+						    placedObject.svg.freeTransform.apply();
+							self.paper.append(placedObject.svg);
+
+							self.placedObjects.push(placedObject);
+
+						});
+						
+						var h1 = document.createElement("h1");
+						h1.innerHTML = placedObject.title;
+
+						var h2 = document.createElement("h2");
+						h2.innerHTML = placedObject.heading;
+
+						var p = document.createElement("p");
+						p.innerHTML = placedObject.paragraph;
+
+						var textWrapper = document.createElement("div");
+
+						textWrapper.className = 'info-text';
+						textWrapper.appendChild(h1);
+						textWrapper.appendChild(h2);
+						textWrapper.appendChild(p);
+						document.body.appendChild(textWrapper);
+
+						// Wait for the image to load before
+						// rasterizing the text element
+						if (placedObject.image) {
+
+							var img = document.createElement("img");
+							img.src = placedObject.image;
+
+							img.onload = function(e) {
+								addTextToScene(textWrapper, placedObject);
+							}
+
+						} else {
+							addTextToScene(textWrapper, placedObject);
+						}
+
+					});
+
+					function addTextToScene(textElement, placedObject) {
+
+					    html2canvas(textElement, {
+					      onrendered: function(canvas) {
+
+					      	var textPixelsToSceneRatio = 50;
+							
+							var texture1 = new THREE.Texture(canvas) 
+							texture1.needsUpdate = true;
+						      
+						    var material1 = new THREE.MeshBasicMaterial( {map: texture1, side:THREE.DoubleSide } );
+						    material1.transparent = true;
+
+						    var mesh1 = new THREE.Mesh(
+						        new THREE.PlaneGeometry(canvas.width / textPixelsToSceneRatio, canvas.height / textPixelsToSceneRatio),
+						        material1
+						      );
+							mesh1.position.set(0, 20, 0);
+							placedObject.mesh = mesh1;
+							self.scene.add( placedObject.mesh );
+
+					      }
+					    });
+
+					}
+
+				}
+
+				self.addWall = function() {
+					var objectName = "wall_" + self.placedObjects.length;
+					var placedObject = {
+						name: objectName,
+						x: 50,
+						y: 50,
+						width: 12.5, 
+						length: 200 // in Pixels
+					}
+
+					// SVG Object part
+					placedObject.svg = self.paper
+		                    .rect(placedObject.x, placedObject.y, placedObject.width, placedObject.length)
+		                    .attr({
+		                        cursor: 'move',
+		                        fill: '#ffffff'
+		                    });
+		            self.paper.freeTransform(placedObject.svg, {
+		            	snap: {
+		            		rotate: 15,
+		            	},
+		            	scale: false,
+		            	size: 15
+		            });
+
+		            // THREE Object part
+		            var geometry = new THREE.BoxGeometry(self.wallWidth, self.roomHeight, pxToThree(placedObject.length));
+					var material = new THREE.MeshLambertMaterial({ color: 0xf0f0f0 });
+
+
+
+					placedObject.mesh = new THREE.Mesh( geometry, material );
+					var newCoords = self.project3D(placedObject.x, placedObject.y);
+					//placedObject.mesh.position.set(pxToThree(placedObject.x), self.roomHeight / 2, pxToThree(placedObject.y));
+					placedObject.mesh.castShadow = true;
+					placedObject.mesh.name = objectName;
+
+			    	placedObject.mesh.geometry.applyMatrix( 
+			    		new THREE.Matrix4().makeTranslation(pxToThree(placedObject.x), self.roomHeight / 2, pxToThree( (placedObject.length / 2) + placedObject.y) ) 
+			    	);
+
+					self.scene.add( placedObject.mesh );
+					self.placedObjects.push(placedObject);
+
+				}
+
+				self.setupCamera = function() {
+					self.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 2000 );
+				}
+
+				self.setupScene = function() {
+					self.scene = new THREE.Scene();
+					self.scene.fog = new THREE.Fog( 0x222222, 0, 300 );
+				}
+
+				self.setupLights = function() {
+
+					var ambientLight = new THREE.AmbientLight( 0x333333 ); // soft white light
+					self.scene.add( ambientLight );
+
+					var dlight = new THREE.DirectionalLight( 0xffffff, .5 );
+					dlight.position.set( 50, 50, 50 );
+					
+					dlight.castShadow = true;
+					dlight.shadowCameraVisible = true;
+					dlight.shadowCameraNear = 2;
+					dlight.shadowCameraFar = 200;
+					var cameraSize = 80;
+					dlight.shadowCameraLeft = -cameraSize;
+					dlight.shadowCameraRight = cameraSize;
+					dlight.shadowCameraTop = cameraSize;
+					dlight.shadowCameraBottom = -cameraSize;
+					self.scene.add(dlight);
+
+					var lightBulbs = [
+						{ x: -30, y: 26, z: 20, color: 0xffffff, intensity: .75 },
+						{ x: 0, y: 26, z: 20, color: 0xffffff, intensity: .75 },
+						{ x: 30, y: 26, z: 20, color: 0xffffff, intensity: .75 }
+					]
+
+					lightBulbs.map(function(lightBulb) {
+
+						var plight = new THREE.PointLight( lightBulb.color, lightBulb.intensity, 50 );
+						plight.position.set( lightBulb.x, lightBulb.y, lightBulb.z );
+
+						var lightGizmo = new THREE.BoxGeometry(1,1,1);
+						material = new THREE.MeshBasicMaterial({ color: 0xffff22 });
+						mesh = new THREE.Mesh(lightGizmo, material);
+						mesh.position.set( lightBulb.x, lightBulb.y, lightBulb.z );
+
+						self.scene.add(mesh);
+						self.scene.add( plight );
+
+					});
+
+
+				}
+
+				self.setupControls = function() {
+					console.log(self.manager);
+					if (self.manager.isVRMode()) {
+						self.controls = self.vrControls;
+					} else {
+						self.controls = new THREE.PointerLockControls( self.camera );
+						//orbitControls = new THREE.OrbitControls(camera);
+						self.scene.add( self.controls.getObject() );
+						self.controls.getObject().position.x = 20;
+						self.controls.getObject().position.z = 100;
+					}
+				}
+
+				self.setupVRHandlers = function() {
+					self.vrEffect = new THREE.VREffect(self.renderer);
+					self.vrControls = new THREE.VRControls(self.camera);
+				}
+
+				self.setupSkyBox = function() {
+				
+					// axes
+					var axes = new THREE.AxisHelper(100);
+					self.scene.add( axes );
+
+					var skyGeometry = new THREE.CubeGeometry( 1000, 1000, 1000 );	
+					
+					/*
+					var imagePrefix = "images/skybox/";
+					var directions  = ["skybox_right", "skybox_left", "skybox_top", "skybox_bottom", "skybox_front", "skybox_back"];
+					var imageSuffix = ".png";
+					
+					var materialArray = [];
+					for (var i = 0; i < 6; i++)
+						materialArray.push( new THREE.MeshBasicMaterial({
+							map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+							side: THREE.BackSide,
+							opacity: .5
+						}));
+					var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+					*/
+					var skyMaterial = new THREE.MeshBasicMaterial( { color: 0x333333, side: THREE.BackSide } );
+					var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+					self.scene.add( skyBox );
+					//self.scene.add(sky);
+				}
+
+				self.setupDOMListeners = function() {
+
+					var onKeyDown = function ( event ) {
+
+						switch ( event.keyCode ) {
+
+							case 32: // Space bar
+								if (manager.isVRMode()) {
+									self.controls.zeroSensor();
+								}
+								break;
+
+							case 38: // up
+							case 87: // w
+								self.moveForward = true;
+								break;
+
+							case 37: // left
+							case 65: // a
+								self.moveLeft = true; break;
+
+							case 40: // down
+							case 83: // s
+								self.moveBackward = true;
+								break;
+
+							case 39: // right
+							case 68: // d
+								self.moveRight = true;
+								break;
+
+							case 32: // space
+								if ( self.canJump === true ) self.velocity.y += 350;
+								self.canJump = false;
+								break;
+
+						}
+
+					};
+
+					var onKeyUp = function ( event ) {
+
+						switch( event.keyCode ) {
+
+							case 38: // up
+							case 87: // w
+								self.moveForward = false;
+								break;
+
+							case 37: // left
+							case 65: // a
+								self.moveLeft = false;
+								break;
+
+							case 40: // down
+							case 83: // s
+								self.moveBackward = false;
+								break;
+
+							case 39: // right
+							case 68: // d
+								self.moveRight = false;
+								break;
+
+						}
+
+					};
+
+					var onMouseDown = function() {
+						self.controls.enabled = true;
+					}
+
+					var onMouseUp = function() {
+						self.controls.enabled = false;
+					}
+
+					var onWindowResize = function() {
+						self.camera.aspect = window.innerWidth / window.innerHeight;
+						self.camera.updateProjectionMatrix();
+						self.renderer.setSize( window.innerWidth, window.innerHeight );
+					}
+
+					document.getElementById("intro").addEventListener("click", function(e) {
+						e.preventDefault();
+						document.getElementById("intro").className = "hide";
+					});
+
+					window.addEventListener( 'resize', onWindowResize, false );
+					document.addEventListener( 'keydown', onKeyDown, false );
+					document.addEventListener( 'keyup', onKeyUp, false );
+					//self.renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
+					//self.renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
+				}
+
+				self.setupRayCaster = function() {
+					self.raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+				}
+
+				self.addFloor = function() {
+
+					// Wooden outer floor
+					var geometry = new THREE.PlaneGeometry( 500, 500, 20, 20 );
+					geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+					var woodTexture = THREE.ImageUtils.loadTexture( 'images/wood.jpg' );
+					woodTexture.wrapS = THREE.RepeatWrapping;
+					woodTexture.wrapT = THREE.RepeatWrapping;
+					woodTexture.repeat.set( 50, 50 );
+
+					var material = new THREE.MeshLambertMaterial({
+						map: woodTexture,
+					});
+
+					mesh = new THREE.Mesh( geometry, material );
+					mesh.receiveShadow = true;
+					self.floor = mesh;
+					self.scene.add( self.floor );
+
+					// Inner mosaic tile floor
+					var geometry = new THREE.PlaneGeometry( 100, 100, 20, 20 );
+					geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+					var woodTexture = THREE.ImageUtils.loadTexture( 'images/bathroom2.jpg' );
+					woodTexture.wrapS = THREE.RepeatWrapping;
+					woodTexture.wrapT = THREE.RepeatWrapping;
+					woodTexture.repeat.set( 30, 30 );
+
+					var material = new THREE.MeshLambertMaterial({
+						map: woodTexture,
+					});
+
+					mesh = new THREE.Mesh( geometry, material );
+					mesh.receiveShadow = true;
+					mesh.position.y = .1; // On top of the wooden floor
+					self.scene.add( mesh );
+
+				}
+
+				self.addDefaultWalls = function() {
+					/*
+					var geometry = new THREE.BoxGeometry(100, 100, 40);
+					var material = new THREE.MeshLambertMaterial({
+						color: 0xeeeeee,
+						side: THREE.BackSide
+					});
+					mesh = new THREE.Mesh( geometry, material );
+					self.scene.add( mesh );
+					*/
+				}
+
+				self.addRoof = function() {
+					/*
+					var geometry = new THREE.PlaneGeometry( 500, 500, 20, 20 );
+					var material = new THREE.MeshLambertMaterial({
+						color: 0xeeeeee,
+						side: THREE.BackSide
+					});
+					geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ));
+					mesh = new THREE.Mesh( geometry, material );
+					mesh.position.y = self.roomHeight;
+					self.scene.add( mesh );
+					*/
+				}
+
+				self.addObjects = function() {
+					// PRIMER PARED
+					var geometry = new THREE.BoxGeometry(3,26,40);
+					var material = new THREE.MeshLambertMaterial({ color: 0xeeeeff });
+					pared3D = new THREE.Mesh( geometry, material );
+					pared3D.position.set(-5,13,0);
+					pared3D.castShadow = true;
+					pared3D.receiveShadow = true;
+					self.scene.add( pared3D );
+				}
+
+				self.setupRenderer = function() {
+					self.renderer = new THREE.WebGLRenderer({ antialias: true });
+					self.renderer.setClearColor( 0xffffff );
+					self.renderer.setPixelRatio( window.devicePixelRatio );
+					self.renderer.setSize( window.innerWidth, window.innerHeight );
+					self.renderer.shadowMapEnabled = true;
+				    self.renderer.shadowMapSoft = true;
+				    self.renderer.shadowMapBias = 0.0039;
+				    self.renderer.shadowMapDarkness = 0.8;
+				    self.renderer.shadowMapWidth = 1024;
+				    self.renderer.shadowMapHeight = 1024;
+
+				    /*
+				    self.renderer.shadowCameraNear = 3;
+				    self.renderer.shadowCameraFar = self.camera.far;
+				    self.renderer.shadowCameraFov = 50;
+
+				    */
+
+					document.getElementById("web-gl-wrapper").appendChild( self.renderer.domElement );
+				}
+
+				self.init = function() {
+
+					self.pointerLockHandler();
+					self.setupSVG();
+
+					self.setupScene();
+					self.setupCamera();
+					self.addFloor();
+					self.addDefaultWalls();
+					self.addRoof();
+					self.setupSkyBox();
+					self.setupLights();
+
+					self.setupRayCaster();
+
+					self.addWall();
+					self.loadModels();
+
+					self.setupRenderer();
+
+					self.setupVRHandlers();
+
+					// Initialize the WebVR manager.
+					self.manager = new WebVRManager(self.renderer, self.vrEffect);
+
+					self.setupControls();
+
+					self.setupDOMListeners();
+
+					self.addTexts();
+
+					//var a = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+
+				}
+
+				self.animate = function() {
+
+					requestAnimationFrame( self.animate );
+
+					// Was: if ( controlsEnabled )
+					if ( true ) {
+
+						self.raycaster.ray.origin.copy( self.controls.getObject().position );
+						self.raycaster.ray.origin.y -= 10;
+
+						/*var intersections = self.raycaster.intersectObjects( self.placedObjects );
+						var isOnObject = intersections.length > 0;*/
+						var time = performance.now();
+						var delta = ( time - self.prevTime ) / 1000;
+
+						self.velocity.x -= self.velocity.x * 10.0 * delta;
+						self.velocity.z -= self.velocity.z * 10.0 * delta;
+
+						self.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+						if ( self.moveForward ) self.velocity.z -= 400.0 * delta;
+						if ( self.moveBackward ) self.velocity.z += 400.0 * delta;
+
+						if ( self.moveLeft ) self.velocity.x -= 400.0 * delta;
+						if ( self.moveRight ) self.velocity.x += 400.0 * delta;
+
+						/*
+						if ( isOnObject === true ) {
+							self.velocity.y = Math.max( 0, self.velocity.y );
+
+							canJump = true;
+						}*/
+
+						self.controls.getObject().translateX( self.velocity.x * delta );
+						self.controls.getObject().translateY( self.velocity.y * delta );
+						self.controls.getObject().translateZ( self.velocity.z * delta );
+
+						if ( self.controls.getObject().position.y < 18 ) {
+
+							self.velocity.y = 0;
+							self.controls.getObject().position.y = 18;
+
+							canJump = true;
+
+						}
+
+						self.prevTime = time;
+
+					}
+
+					self.placedObjects.map(self.matchPosition);
+
+					if (self.manager.isVRMode()) {
+						self.vrEffect.render( self.scene, self.camera );
+						self.vrControls.update();
+						self.hideFloorPlan();
+					} else {
+						self.renderer.render( self.scene, self.camera );
+						//self.controls.update();
+					}
+
+				}
+
+				self.hideFloorPlan = function() {
+					var nodes = document.querySelectorAll(".no-vr");
+					for(var i in nodes) {
+						nodes[i].style.display = "none";
+					}
+				}
+
+				self.project3D = function(x, y) {
+					// TODO: Proper math for 2d/3d projection
+					return { x: pxToThree(x), z: pxToThree(y) };
+				}
+
+	          	self.matchPosition = function(placedObject) {
+	          		
+	          		placedObject.mesh.rotation.y = - THREE.Math.degToRad(placedObject.svg.freeTransform.attrs.rotate);
+	          		
+	          		var newCoords = self.project3D(placedObject.svg.freeTransform.attrs.translate.x, placedObject.svg.freeTransform.attrs.translate.y);
+
+	          		var xOffset = zOffset = 50;
+
+	            	placedObject.mesh.position.x = newCoords.x - xOffset;
+	            	placedObject.mesh.position.z = newCoords.z - zOffset;
+	            }
+
+				self.setupSVG = function() {
+		            self.paper = Snap('#svg-container');
+				}
+
+				self.loadModels = function() {
+
+					var models = [
+						{ name: "arma", scale: .1, x: 20, y: .5, rotateX: 90, format: "json" },
+						{ name: "baniera", scale: .01, x: -20, y: 0, format: "dae" },
+						{ name: "inodoro", scale: 3, x: -20, y: 0, rotateX: 90, format: "json" },
+						{ name: "bidet", scale: 3, x: -20, y: 0, rotateX: 90, format: "json" },
+					];
+					var currentModel = 0;
+
+					function loadNextModel() {
+						var modelName = models[currentModel].name;
+
+						var xCenter = 250; 
+
+						var placedObject = {
+							name: modelName,
+							x: xCenter - 25,
+							y: 50 + (currentModel * 100),
+							width: 50,
+							length: 50						
+						};
+
+						var loader;
+						switch (models[currentModel].format) {
+							case "json":
+								loader = new THREE.JSONLoader();
+							break;
+							default:
+								loader = new THREE.ColladaLoader();
+							break;
+						}
+
+						console.log("Loading " + models[currentModel].format.toUpperCase() + " model: " + modelName);
+						loader.load( './models/' + modelName + '/' + modelName + "." + models[currentModel].format, function ( loadedModel, loadedMaterials ) {
+
+								console.log("Model loaded: " + modelName);
+								
+								function getColladaMesh(collada) {
+									var dae = collada.scene;
+									dae.scale.x = dae.scale.y = dae.scale.z = models[currentModel].scale;
+									if (models[currentModel].rotateX) {
+										dae.rotation.x = THREE.Math.degToRad(models[currentModel].rotateX);
+									}
+									dae.position.y = models[currentModel].y;
+									dae.position.x = models[currentModel].x;
+									dae.updateMatrix();
+									return dae;
+								}
+
+								function getJSONMesh(json) {
+									var materials = new THREE.MeshFaceMaterial( loadedMaterials );
+								    var mesh = new THREE.Mesh( json, materials );
+								    mesh.position.set( 0, models[currentModel].y, 0 );
+								    mesh.scale.set(models[currentModel].scale, models[currentModel].scale, models[currentModel].scale);
+								    mesh.overdraw = true;
+
+								    if (models[currentModel].rotateX) {
+								    	mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - THREE.Math.degToRad(models[currentModel].rotateX) ) );
+								    }
+								    return mesh;
+								}
+
+								switch(models[currentModel].format) {
+									case "dae":
+										placedObject.mesh = getColladaMesh(loadedModel);
+									break;
+									case "json":
+										placedObject.mesh = getJSONMesh(loadedModel);
+									break;
+								}
+
+								placedObject.mesh.traverse( function ( node ) {
+									if ( node instanceof THREE.Mesh ) {
+										node.castShadow = true;
+										node.receiveShadow = true;
+									}
+									if ( node.material ) {
+								        //node.material.side = THREE.DoubleSide;
+								    }
+								} );
+
+								self.scene.add(placedObject.mesh);
+
+								Snap.load('./models/' + modelName + '/' + modelName + ".svg", function (loadedIcon) {
+
+									loadedIcon.selectAll("path[fill='#000000']").attr({fill: "#ffffff"});
+
+
+									placedObject.svg = self.paper.g();
+
+									var circledIcon = self.paper.g();
+									// 64x64 Icons
+									var circle = self.paper.circle(32,32,48);
+									circle.attr({ fill: "#9df", "fill-opacity": 0.5 });
+
+									circledIcon.append(circle);
+									circledIcon.append(loadedIcon);
+									placedObject.svg.append(circledIcon);
+
+								    self.paper.freeTransform(placedObject.svg, { scale: false, size: 15 });
+
+								    placedObject.svg.freeTransform.attrs.translate.x = placedObject.x;
+								    placedObject.svg.freeTransform.attrs.translate.y = placedObject.y;
+								    placedObject.svg.freeTransform.apply();
+									self.paper.append(placedObject.svg);
+
+									self.placedObjects.push(placedObject);
+
+									currentModel++;
+									if (currentModel == models.length) {
+										console.log("All models loaded.");
+										self.animate();
+									} else {
+
+										loadNextModel();
+									}
+
+								});
+														
+						});
+
+					}
+
+					loadNextModel();
+
+				}
+
+				self.cancelPointerLock = function() {
+
+					// Ask the browser to lock the pointer
+					element.exitPointerLock = element.exitPointerLock || element.mozExitPointerLock || element.exitRequestPointerLock;
+
+					var pointerLockToggle = document.getElementById("pointerLockToggle");
+					pointerLockToggle.style.display = '';
+
+					element.exitPointerLock();
+
+				}
+
+				self.pointerLockHandler = function() {
+					var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
+
+					var pointerLockToggle = document.getElementById("pointerLockToggle");
+
+					if ( havePointerLock ) {
+
+						var element = document.body;
+
+						var pointerlockchange = function ( event ) {
+
+							if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+
+								self.controlsEnabled = true;
+								self.controls.enabled = true;
+								pointerLockToggle.style.display = 'none';
+
+							} else {
+
+								self.controls.enabled = false;
+								pointerLockToggle.style.display = '';
+
+							}
+
+						}
+
+						var pointerlockerror = function ( event ) {
+
+							pointerLockToggle.style.display = '';
+
+						}
+
+						// Hook pointer lock state change events
+						document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+						document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+						document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+
+						document.addEventListener( 'pointerlockerror', pointerlockerror, false );
+						document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
+						document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
+
+						pointerLockToggle.addEventListener( 'click', function ( event ) {
+
+							// Ask the browser to lock the pointer
+							element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+
+							element.requestPointerLock();
+
+							/*
+							if ( /Firefox/i.test( navigator.userAgent ) ) {
+
+								var fullscreenchange = function ( event ) {
+
+									if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
+
+										document.removeEventListener( 'fullscreenchange', fullscreenchange );
+										document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
+
+										element.requestPointerLock();
+									}
+
+								}
+
+								document.addEventListener( 'fullscreenchange', fullscreenchange, false );
+								document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
+
+								element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
+
+								element.requestFullscreen();
+
+							} else {
+
+								element.requestPointerLock();
+
+							}*/
+
+						}, false );
+
+					} else {
+
+						pointerLockToggle.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
+
+					}
+				}
+
+
+			}
+
+			csvr = new CrimeSceneVR();
+			csvr.init();
+
+		</script>
+
+	</body>
+</html>
+<?php
+error_log("\n" . date("d/m/Y H:i:s") . " - [" . $_SERVER["REMOTE_ADDR"] . "] - " . $_SERVER["HTTP_USER_AGENT"], 3, "_visitas.log");
+?>

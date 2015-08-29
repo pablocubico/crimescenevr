@@ -1,0 +1,36 @@
+{
+  "name": "CrimeSceneVR",
+  "version": "0.0.1",
+  "authors": [
+    "Pablo Cúbico <hola@pablocubi.co>"
+  ],
+  "description": "A tool to build VR-enabled 3D crime scenes using a floorplan approach.",
+  "main": "index.html",
+  "moduleType": [
+    "es6",
+    "globals"
+  ],
+  "keywords": [
+    "vr",
+    "3d",
+    "crime",
+    "scene",
+    "investigation",
+    "journalism",
+    "oculus",
+    "leap"
+  ],
+  "license": "MIT",
+  "homepage": "pablocubi.co/crimescenevr",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "snap.svg": "~0.4.1",
+    "threejs": "*"
+  }
+}
