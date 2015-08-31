@@ -11,7 +11,7 @@
 			}
 
 			body {
-				background-color: #ffffff;
+				background-color: #111;
 				margin: 0;
 				overflow: hidden;
 				font-family: Montserrat;
@@ -19,14 +19,10 @@
 			}
 
 			#blocker {
-
 				position: absolute;
-
 				width: 100%;
 				height: 100%;
-
 				background-color: rgba(0,0,0,0.5);
-
 			}
 
 			#instructions {
@@ -99,6 +95,8 @@
             	z-index: 99999;
             	transition: all .5s;
             	top: 0%;
+            	/*top: -100%;
+            	display: none;*/
             }
 
             #intro.hide {
@@ -171,6 +169,7 @@
 				font-size: 2em;
 				font-family: "Montserrat";
 				font-weight: 400;
+
 			}
 
 			.info-text img {
@@ -359,6 +358,8 @@
 					function addTextToScene(textElement, placedObject) {
 
 					    html2canvas(textElement, {
+					      /*width: 600,
+					      height: 800,*/
 					      onrendered: function(canvas) {
 
 					      	var textPixelsToSceneRatio = 50;
@@ -413,8 +414,6 @@
 		            var geometry = new THREE.BoxGeometry(self.wallWidth, self.roomHeight, pxToThree(placedObject.length));
 					var material = new THREE.MeshLambertMaterial({ color: 0xf0f0f0 });
 
-
-
 					placedObject.mesh = new THREE.Mesh( geometry, material );
 					var newCoords = self.project3D(placedObject.x, placedObject.y);
 					//placedObject.mesh.position.set(pxToThree(placedObject.x), self.roomHeight / 2, pxToThree(placedObject.y));
@@ -422,7 +421,8 @@
 					placedObject.mesh.name = objectName;
 
 			    	placedObject.mesh.geometry.applyMatrix( 
-			    		new THREE.Matrix4().makeTranslation(pxToThree(placedObject.x), self.roomHeight / 2, pxToThree( (placedObject.length / 2) + placedObject.y) ) 
+			    		new THREE.Matrix4().makeTranslation(0, self.roomHeight / 2, 0 )
+			    		//new THREE.Matrix4().makeTranslation(pxToThree(placedObject.x), self.roomHeight / 2, pxToThree( (placedObject.length / 2) + placedObject.y) ) 
 			    	);
 
 					self.scene.add( placedObject.mesh );
@@ -842,6 +842,11 @@
 	          		var newCoords = self.project3D(placedObject.svg.freeTransform.attrs.translate.x, placedObject.svg.freeTransform.attrs.translate.y);
 
 	          		var xOffset = zOffset = 50;
+
+	          		// Ugly hack to offset the walls.
+	          		if (placedObject.length) {
+	          			zOffset -= pxToThree(placedObject.length / 2)
+	          		}
 
 	            	placedObject.mesh.position.x = newCoords.x - xOffset;
 	            	placedObject.mesh.position.z = newCoords.z - zOffset;
