@@ -87,6 +87,8 @@
             }
 
             #intro {
+            	font-family: 'Playfair Display', serif;
+            	font-weight: 900;
             	background: url(images/crimescenevr-bg.jpg) no-repeat center center;
             	background-size: cover;
             	position: fixed;
@@ -97,6 +99,12 @@
             	top: 0%;
             	/*top: -100%;
             	display: none;*/
+            }
+
+            #intro .title {
+            	position: absolute;
+            	width: 50%;
+            	left: 10px;
             }
 
             #intro.hide {
@@ -292,7 +300,7 @@
 				self.addTexts = function() {
 					
 					var texts = [
-						{ title: "Beretta", heading: "Arma policial", image: "images/beretta92.jpg", paragraph: "Voceros de la <b>comisaría Segunda</b> señalaron que poco después se determinó que <b>el arma había sido sustraída</b> los primeros días de enero de la vivienda del oficial principal de la Delegación Departamental de Investigaciones Rubén Walter.", x: 10, y: 10 },
+						{ title: "Beretta", heading: "Arma policial", image: "images/beretta92.jpg", paragraph: "Voceros de la <b>comisaría Segunda</b> señalaron que poco después se determinó que <b>el arma había sido sustraída</b> los primeros días de enero de la vivienda del oficial principal de la Delegación Departamental de Investigaciones Rubén Walter.", x: 150, y: 150 },
 					];
 
 					texts.map(function(placedObject) { 
@@ -406,7 +414,7 @@
 		            	snap: {
 		            		rotate: 15,
 		            	},
-		            	scale: false,
+		            	scale: true,
 		            	size: 15
 		            });
 
@@ -846,6 +854,14 @@
 	          		// Ugly hack to offset the walls.
 	          		if (placedObject.length) {
 	          			zOffset -= pxToThree(placedObject.length / 2)
+	          		}
+
+	          		if (placedObject.svg.freeTransform.attrs.scale.x != 1) {
+	          			placedObject.mesh.scale.x = placedObject.svg.freeTransform.attrs.scale.x;
+	          		}
+
+	          		if (placedObject.svg.freeTransform.attrs.scale.y != 1) {
+	          			placedObject.mesh.scale.z = placedObject.svg.freeTransform.attrs.scale.y;
 	          		}
 
 	            	placedObject.mesh.position.x = newCoords.x - xOffset;
