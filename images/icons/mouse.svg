@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="120"
+   height="120"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="wall.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="74.868848"
+     inkscape:cy="160.12616"
+     inkscape:document-units="px"
+     inkscape:current-layer="g3167"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-932.36218)">
+    <g
+       id="g3039"
+       transform="translate(9.2076124,833.24766)">
+      <g
+         id="g3062"
+         transform="translate(185.24912,37.875167)">
+        <flowRoot
+           xml:space="preserve"
+           id="flowRoot3069"
+           style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Sans;font-style:normal;font-weight:normal;font-size:12px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+             id="flowRegion3071"><rect
+               id="rect3073"
+               width="169.20055"
+               height="41.921329"
+               x="133.84521"
+               y="44.23856" /></flowRegion><flowPara
+             id="flowPara3075"></flowPara></flowRoot>        <flowRoot
+           xml:space="preserve"
+           id="flowRoot3077"
+           style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Sans;font-style:normal;font-weight:normal;font-size:12px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+             id="flowRegion3079"><rect
+               id="rect3081"
+               width="82.327431"
+               height="27.274118"
+               x="184.35284"
+               y="52.319778" /></flowRegion><flowPara
+             id="flowPara3083"></flowPara></flowRoot>        <g
+           id="g3099"
+           transform="translate(-109.16517,-26.988709)">
+          <g
+             id="g3138"
+             transform="translate(-86.597737,-91.423756)">
+            <g
+               id="g3167"
+               transform="translate(35.687206,28.459898)">
+              <path
+                 id="path3155"
+                 d="m -10.681806,175.10672 c 12.5697325,-12.55173 32.936043,-12.53758 45.486476,0.0309 l 26.362986,26.40159 c 12.55172,12.56973 12.537568,32.93603 -0.03088,45.48647 -12.569732,12.55301 -32.936043,12.53757 -45.486476,-0.0309 l -26.36427,-26.40159 c -12.551721,-12.56844 -12.537568,-32.93476 0.03216,-45.48647 z m 16.3638102,16.38696 c 2.0108987,-2.00833 5.2697658,-2.00576 7.2780928,0.005 2.008327,2.0109 2.005753,5.26976 -0.0051,7.27809 -2.010901,2.00833 -5.269768,2.00576 -7.2780942,-0.005 -2.0083267,-2.01218 -2.0057531,-5.26976 0.0051,-7.2781 z"
+                 clip-rule="evenodd"
+                 inkscape:connector-curvature="0"
+                 style="fill:#ffffff;fill-rule:evenodd" />
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

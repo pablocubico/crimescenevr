@@ -115,7 +115,8 @@ Snap.plugin(function(Snap, Element, Paper, global, Fragment) {
                     scale: 0,
                     drag: 7
                 },
-                size: 4
+                size: 4,
+                scaleHandlerSize: 5
             },
             subject: subject
         };
@@ -711,8 +712,8 @@ Snap.plugin(function(Snap, Element, Paper, global, Fragment) {
             if (!isNaN(ft.opts.size)) {
                 ft.opts.size = {
                     axes: ft.opts.size,
-                    bboxCorners: ft.opts.size,
-                    bboxSides: ft.opts.size,
+                    bboxCorners: ft.opts.scaleHandlerSize,
+                    bboxSides: ft.opts.scaleHandlerSize,
                     center: ft.opts.size
                 };
             }
